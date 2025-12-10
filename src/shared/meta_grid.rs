@@ -129,6 +129,31 @@ impl<M: Metadata> MetaGrid<M> {
             .collect()
     }
 
+    pub fn adjacent(&self, pos: Position) -> Vec<(Position, char, M)> {
+        let mut items = Vec::new();
+
+        let positions = [
+            pos + UP + LEFT,
+            pos + UP,
+            pos + UP + RIGHT,
+            pos + LEFT,
+            // self
+            pos + RIGHT,
+            pos + DOWN + LEFT,
+            pos + DOWN,
+            pos + DOWN + RIGHT,
+        ];
+
+        for p in positions {
+            if self.in_bounds(p) {
+                let at = self.at(p);
+                items.push((p, at.0, at.1.clone()));
+            }
+        }
+
+        return items;
+    }
+
     pub fn adjacent_orthogonal(&self, pos: Position) -> Vec<(Position, char, M)> {
         let mut items = Vec::new();
 
@@ -139,7 +164,7 @@ impl<M: Metadata> MetaGrid<M> {
             }
         }
 
-        items
+        return items;
     }
 
     pub fn in_bounds(&self, p: Position) -> bool {
