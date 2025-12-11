@@ -1,5 +1,6 @@
 #![allow(unused)]
 mod char_grid;
+pub use char_grid::{CharGrid, CharGridView};
 mod meta_grid;
 pub use meta_grid::{MetaGrid, MetaGridView, Metadata};
 

@@ -17,7 +17,7 @@ pub fn input(day: u8) -> Result<String> {
     let path = format!("inputs/{}.txt", day);
 
     match read_to_string(&path) {
-        Ok(v) => Ok(v.trim_end().to_owned()),
+        Ok(v) => Ok(v.trim_end_matches("\n").to_owned()),
         Err(e) => err(&format!("failed to read file {path}: {e}")),
     }
 }

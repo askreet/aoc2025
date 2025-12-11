@@ -30,7 +30,7 @@ impl CharGrid {
         let mut chars = Vec::new();
 
         for line in str.lines() {
-            let trimmed = line.trim();
+            let trimmed = line.trim_end_matches("\n");
             if width == 0 {
                 width = trimmed.len() as i32
             } else if width != trimmed.len() as i32 {
