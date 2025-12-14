@@ -1,9 +1,10 @@
 use crate::shared::*;
 use std::collections::HashSet;
+use std::fmt::Display;
 use std::fs::read_to_string;
 
-pub trait Metadata: Default + Clone {}
-impl<T: Default + Clone> Metadata for T {}
+pub trait Metadata: Default + Clone + Display {}
+impl<T: Default + Clone + Display> Metadata for T {}
 
 // A 2d grid of chars which can be loaded from a text file,
 // and carries metadata about each cell.
@@ -36,7 +37,7 @@ impl<M: Metadata> MetaGrid<M> {
         let mut chars = Vec::new();
 
         for line in str.lines() {
-            let trimmed = line.trim();
+            let trimmed = line.trim_end_matches("\n");
             if width == 0 {
                 width = trimmed.len() as i32
             } else if width != trimmed.len() as i32 {
@@ -85,6 +86,15 @@ impl<M: Metadata> MetaGrid<M> {
         self.chars[((pos.y * self.width) + pos.x) as usize] = c
     }
 
+    pub fn set_checked(&mut self, pos: Position, c: char) -> bool {
+        if self.in_bounds(pos) {
+            self.set(pos, c);
+            return true;
+        }
+
+        return false;
+    }
+
     pub fn at(&self, pos: Position) -> (char, &M) {
         let idx = ((pos.y * self.width) + pos.x) as usize;
         (self.chars[idx], &self.meta[idx])
@@ -95,6 +105,14 @@ impl<M: Metadata> MetaGrid<M> {
         (self.chars[idx], self.meta[idx].clone())
     }
 
+    pub fn at_checked(&self, pos: Position) -> Option<(char, &M)> {
+        if self.in_bounds(pos) {
+            Some(self.at(pos))
+        } else {
+            None
+        }
+    }
+
     pub fn meta(&self, pos: Position) -> &M {
         let idx = ((pos.y * self.width) + pos.x) as usize;
         &self.meta[idx]
@@ -103,6 +121,12 @@ impl<M: Metadata> MetaGrid<M> {
     pub fn set_meta(&mut self, pos: Position, v: M) {
         let idx = ((pos.y * self.width) + pos.x) as usize;
         self.meta[idx] = v;
+    }
+
+    pub fn set_meta_checked(&mut self, pos: Position, v: M) {
+        if self.in_bounds(pos) {
+            self.set_meta(pos, v);
+        }
     }
 
     pub fn find_one(&self, c: char) -> Result<Position> {
@@ -207,6 +231,44 @@ impl<M: Metadata> MetaGrid<M> {
         str.push('\n');
 
         str
+    }
+
+    pub fn draw_meta(&self) -> String {
+        let mut str = String::new();
+
+        for y in 0..self.height() {
+            for x in 0..self.width {
+                let here = self.at(Position::at(x, y));
+                str.push(here.0);
+                str.push_str(&format!("({})", here.1));
+                if x != self.x_max() {
+                    str.push(' ');
+                }
+            }
+            str.push('\n')
+        }
+        str.push('\n');
+
+        str
+    }
+}
+
+impl<T> MetaGrid<T>
+where
+    T: std::iter::Sum + Metadata + Copy,
+{
+    pub fn sum_meta(&self) -> T {
+        self.meta.iter().copied().sum()
+    }
+}
+
+impl<T> MetaGrid<T>
+where
+    T: std::ops::AddAssign + Metadata,
+{
+    pub fn inc_meta(&mut self, pos: Position, v: T) {
+        let idx = ((pos.y * self.width) + pos.x) as usize;
+        self.meta[idx] += v;
     }
 }
 

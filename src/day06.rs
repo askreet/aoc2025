@@ -62,8 +62,6 @@ fn test_part1() {
 }
 
 const SPACE: u8 = ' ' as u8;
-const PLUS: u8 = '+' as u8;
-const MULT: u8 = '*' as u8;
 
 fn part2(input: &str) -> Result<u64> {
     let cg = CharGrid::from_str(input)?;
@@ -91,7 +89,6 @@ fn part2(input: &str) -> Result<u64> {
         if this_operand > 0 {
             this_sum += this_operand;
             this_product *= this_operand;
-            this_operand = 0;
         }
 
         match cg.at(x, cg.y_max()) {
