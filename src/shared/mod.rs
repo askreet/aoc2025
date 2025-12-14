@@ -8,7 +8,7 @@ mod readers;
 pub use readers::*;
 
 use std::fmt::Formatter;
-use std::num::ParseIntError;
+use std::num::{ParseFloatError, ParseIntError};
 use std::ops::Add;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -48,6 +48,14 @@ impl From<ParseIntError> for Error {
     fn from(value: ParseIntError) -> Self {
         Error {
             msg: format!("failed to parse int: {}", value.to_string()),
+        }
+    }
+}
+
+impl From<ParseFloatError> for Error {
+    fn from(value: ParseFloatError) -> Self {
+        Error {
+            msg: format!("failed to parse float: {}", value.to_string()),
         }
     }
 }
